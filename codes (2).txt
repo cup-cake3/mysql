@@ -1,0 +1,1824 @@
+[10/24, 9:41 PM] Atharva: Chit 10
+Use Java and MongoDB
+Connectivity with with MongoDB using any Java application.Write Java code for
+Institute Database (MongoDB) and perform following operations
+1. Create Database.
+2. Create Collection
+3. Insert document.
+4. Display Data.
+5. Remove Document
+6. Update Document.
+
+ChatGPT
+To connect to MongoDB using a Java application and perform the operations you've mentioned, you'll need to use the MongoDB Java driver. Make sure you have the MongoDB Java driver added to your project's dependencies. You can do this in your pom.xml if you are using Maven. If not, you can download the JAR files manually.
+
+Here's a Java code example that demonstrates how to connect to MongoDB and perform the specified operations:
+
+java
+Copy code
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
+public class MongoDBExample {
+    public static void main(String[] args) {
+        // Connect to MongoDB
+        MongoClient mongoClient = new MongoClient("localhost", 27017);
+        MongoDatabase database = mongoClient.getDatabase("InstituteDB");
+
+        // Create Collection
+        MongoCollection<Document> collection = database.getCollection("students");
+
+        // Insert Document
+        Document student1 = new Document("name", "John Doe")
+                .append("age", 20)
+                .append("major", "Computer Science");
+        collection.insertOne(student1);
+
+        // Display Data
+        System.out.println("Data in the collection:");
+        for (Document doc : collection.find()) {
+            System.out.println(doc.toJson());
+        }
+
+        // Remove Document
+        collection.deleteOne(new Document("name", "John Doe"));
+
+        // Update Document
+        collection.updateOne(new Document("name", "John Doe"),
+                new Document("$set", new Document("age", 21)));
+
+        // Display Data after update
+        System.out.println("Data in the collection after update:");
+        for (Document doc : collection.find()) {
+            System.out.println(doc.toJson());
+        }
+
+        // Close the MongoDB connection
+        mongoClient.close();
+    }
+}
+In this code:
+
+We connect to a MongoDB instance running on localhost at port 27017 and create or connect to the "InstituteDB" database.
+We create a collection named "students."
+We insert a sample document into the collection.
+We display the data in the collection.
+We remove a document with the name "John Doe."
+We update the age of the student "John Doe."
+Finally, we close the MongoDB connection.
+Make sure you have the MongoDB server running, and the MongoDB Java driver correctly configured in your project for this code to work.
+[10/24, 9:41 PM] Atharva: Chit 1
+Use MySQL –( Joins and Subqueries)
+Create Customer and Account table and add rows shown below
+
+1. Show the cname, Acc_Type, amount information of customer who is having an saving account.
+2. Display the data using Natural, left and right join.
+3. Display the information of customers living in the same city as of ‘pooja’.
+4. Display the information of account, having less amount than average amount throughout the bank.
+5. Display the C_id having maximum amount in account.
+6. Display the amount and acc_type of those customers whose amount is the minimum amount of that Acc_type.
+7. Display the amount of those accounts whose amount is higher than amount of any saving account amount.
+
+ChatGPT
+To achieve these tasks, we'll create two tables: Customer and Account, and then write MySQL queries for each task. I'll assume the table schemas as follows:
+
+sql
+Copy code
+CREATE TABLE Customer (
+    C_id INT PRIMARY KEY,
+    Cname VARCHAR(255),
+    City VARCHAR(255)
+);
+
+CREATE TABLE Account (
+    Acc_id INT PRIMARY KEY,
+    C_id INT,
+    Acc_Type VARCHAR(255),
+    Amount DECIMAL(10, 2),
+    FOREIGN KEY (C_id) REFERENCES Customer(C_id)
+);
+
+-- Insert sample data
+INSERT INTO Customer (C_id, Cname, City) VALUES
+    (1, 'John', 'New York'),
+    (2, 'Pooja', 'New York'),
+    (3, 'Alice', 'Los Angeles'),
+    (4, 'Bob', 'New York');
+
+INSERT INTO Account (Acc_id, C_id, Acc_Type, Amount) VALUES
+    (101, 1, 'Savings', 5000.00),
+    (102, 2, 'Savings', 6000.00),
+    (103, 3, 'Current', 7000.00),
+    (104, 4, 'Savings', 4000.00),
+    (105, 1, 'Current', 3000.00);
+Now, let's write queries for each of the tasks:
+
+Show the Cname, Acc_Type, and Amount information of customers with a savings account.
+sql
+Copy code
+SELECT Cname, Acc_Type, Amount
+FROM Customer
+JOIN Account ON Customer.C_id = Account.C_id
+WHERE Acc_Type = 'Savings';
+Display the data using Natural, Left, and Right Join.
+Natural Join:
+sql
+Copy code
+SELECT Cname, Acc_Type, Amount
+FROM Customer
+NATURAL JOIN Account;
+Left Join (All customers and their accounts):
+sql
+Copy code
+SELECT Cname, Acc_Type, Amount
+FROM Customer
+LEFT JOIN Account ON Customer.C_id = Account.C_id;
+Right Join (All accounts and their customers):
+sql
+Copy code
+SELECT Cname, Acc_Type, Amount
+FROM Customer
+RIGHT JOIN Account ON Customer.C_id = Account.C_id;
+Display the information of customers living in the same city as 'Pooja'.
+sql
+Copy code
+SELECT Cname, City
+FROM Customer
+WHERE City = (SELECT City FROM Customer WHERE Cname = 'Pooja');
+Display the information of accounts with less amount than the average amount throughout the bank.
+sql
+Copy code
+SELECT Acc_id, C_id, Acc_Type, Amount
+FROM Account
+WHERE Amount < (SELECT AVG(Amount) FROM Account);
+Display the C_id having the maximum amount in the account.
+sql
+Copy code
+SELECT C_id
+FROM Account
+WHERE Amount = (SELECT MAX(Amount) FROM Account);
+Display the Amount and Acc_Type of customers whose amount is the minimum amount of that Acc_Type.
+sql
+Copy code
+SELECT a.Acc_Type, a.Amount
+FROM Account a
+WHERE Amount = (
+    SELECT MIN(Amount)
+    FROM Account
+    WHERE Acc_Type = a.Acc_Type
+);
+Display the amount of those accounts whose amount is higher than the amount of any savings account.
+sql
+Copy code
+SELECT Acc_id, Amount
+FROM Account
+WHERE Amount > (SELECT MAX(Amount) FROM Account WHERE Acc_Type = 'Savings');
+These queries should help you accomplish the tasks you've described.
+[10/24, 9:41 PM] Atharva: Chit 6
+PL/SQL Stored Procedure.
+Write a Stored Procedure namely proc_Grade for the categorization of student. If marks scored by students in
+examination is <=1500 and marks>=990 then student will be placed in distinction category if marks scored are
+between 989 and900 category is first class, if marks 899 and 825 category is Higher Second Class Write a PL/SQL
+block for using procedure created with above requirement. Stud_Marks(name, total_marks) Result(Roll,Name,
+Class).
+
+ChatGPT
+To achieve this, you can create a PL/SQL stored procedure named proc_Grade that categorizes students based on their marks and then use it in a PL/SQL block to populate the Result table. Here's the PL/SQL code for the procedure and block:
+
+sql
+Copy code
+-- Create a table to store student marks
+CREATE TABLE Stud_Marks (
+    Roll NUMBER,
+    Name VARCHAR2(50),
+    Total_Marks NUMBER
+);
+
+-- Create a table to store the result
+CREATE TABLE Result (
+    Roll NUMBER,
+    Name VARCHAR2(50),
+    Class VARCHAR2(50)
+);
+
+-- Create the PL/SQL stored procedure
+CREATE OR REPLACE PROCEDURE proc_Grade (p_name IN VARCHAR2, p_total_marks IN NUMBER) IS
+    v_class VARCHAR2(50);
+BEGIN
+    -- Categorize students based on total_marks
+    IF p_total_marks >= 990 AND p_total_marks <= 1500 THEN
+        v_class := 'Distinction';
+    ELSIF p_total_marks >= 900 AND p_total_marks <= 989 THEN
+        v_class := 'First Class';
+    ELSIF p_total_marks >= 825 AND p_total_marks <= 899 THEN
+        v_class := 'Higher Second Class';
+    ELSE
+        v_class := 'Not Categorized';
+    END IF;
+
+    -- Insert the result into the Result table
+    INSERT INTO Result (Roll, Name, Class) VALUES (NULL, p_name, v_class);
+    COMMIT;
+END;
+/
+
+-- PL/SQL block to populate the Result table using the procedure
+DECLARE
+    v_name VARCHAR2(50);
+    v_total_marks NUMBER;
+BEGIN
+    -- You can replace the following values with actual student data
+    v_name := 'John Doe';
+    v_total_marks := 1000;
+
+    -- Call the procedure to categorize the student and store the result
+    proc_Grade(v_name, v_total_marks);
+    
+    -- You can repeat the above block for multiple students
+    -- Make sure to change the values for each student
+
+    -- Commit the changes to the database
+    COMMIT;
+END;
+/
+In this code, we first create two tables: Stud_Marks to store student marks and Result to store the result. Then, we create the proc_Grade stored procedure that categorizes students based on their marks and inserts the result into the Result table. Finally, the PL/SQL block demonstrates how to use the procedure to categorize and store the results for a student. You can repeat the block for multiple students with their respective data.
+[10/24, 9:41 PM] Atharva: Chit 7
+PL/SQL Stored Function.
+Write a Stored Procedure namely proc_Grade for the categorization of student. If marks scored by students in
+examination is <=1500 and marks>=990 then student will be placed in distinction category if marks scored are
+between 989 and900 category is first class, if marks 899 and 825 category is Higher Second Class Write a PL/SQL
+block for using procedure created with above requirement. Stud_Marks(name, total_marks) Result(Roll,Name,
+Class).
+
+ChatGPT
+To achieve this, you can create a PL/SQL stored function called proc_Grade that categorizes students based on their marks. Then, you can use a PL/SQL block to call this function and populate the Result table with the appropriate classifications. Below is the code to accomplish this:
+
+sql
+Copy code
+-- Create the Result table (if it doesn't exist)
+CREATE TABLE Result (
+    Roll NUMBER,
+    Name VARCHAR2(50),
+    Class VARCHAR2(20)
+);
+
+-- Create the PL/SQL stored function
+CREATE OR REPLACE FUNCTION proc_Grade(marks NUMBER) RETURN VARCHAR2 IS
+    grade VARCHAR2(20);
+BEGIN
+    IF marks >= 990 AND marks <= 1500 THEN
+        grade := 'Distinction';
+    ELSIF marks >= 900 AND marks <= 989 THEN
+        grade := 'First Class';
+    ELSIF marks >= 825 AND marks <= 899 THEN
+        grade := 'Higher Second Class';
+    ELSE
+        grade := 'Fail';
+    END IF;
+    
+    RETURN grade;
+END;
+
+-- PL/SQL block to populate the Result table
+DECLARE
+    name VARCHAR2(50);
+    total_marks NUMBER;
+    roll NUMBER;
+    stud_class VARCHAR2(20);
+BEGIN
+    -- Input student marks (You can use a cursor to fetch data from a real table)
+    name := 'Student1';
+    total_marks := 1000; -- Change the marks as needed
+    roll := 1; -- Change the roll number as needed
+
+    -- Call the proc_Grade function to get the student's class
+    stud_class := proc_Grade(total_marks);
+
+    -- Insert the result into the Result table
+    INSERT INTO Result (Roll, Name, Class) VALUES (roll, name, stud_class);
+
+    -- Commit the transaction
+    COMMIT;
+    
+    DBMS_OUTPUT.PUT_LINE('Student ' || name || ' with Roll ' || roll || ' belongs to ' || stud_class || ' class.');
+END;
+/
+In the above code, we first create the Result table and then define the proc_Grade function that takes a student's marks as input and returns their class based on the specified criteria. The PL/SQL block demonstrates how to use the proc_Grade function to categorize a student's marks and insert the result into the Result table. Adjust the name, total_marks, and roll values to match the data for your students.
+
+Please note that this is a simplified example, and in a real-world scenario, you would likely have a database table containing student information, and you would use a cursor or loop to process multiple students.
+[10/24, 9:41 PM] Atharva: Chit 8
+
+(Perform on MYSQL Terminal)
+teaches(T_ID, course_id, sec_id, semester, year)
+student(S_ID, name, dept_name, tot_cred)
+instructor(T_ID, name, dept_name, salary)
+course(course_id, title, dept_name, credits)
+
+i. Find the names of the instructor in the university who have taught the courses semester wise.
+ii. Create View on single table which retrieves student details.
+iii. Rename the column of table student from dept_name to deptatrment_name
+iv. Delete student name whose department is NULL
+
+ChatGPT
+Here are the SQL queries and commands to perform the tasks you've described in a MySQL terminal:
+
+i. Find the names of the instructor in the university who have taught the courses semester-wise:
+
+sql
+Copy code
+SELECT DISTINCT I.name
+FROM instructor I
+JOIN teaches T ON I.T_ID = T.T_ID
+WHERE T.semester = 'YourTargetSemester' AND T.year = YourTargetYear;
+Replace 'YourTargetSemester' and YourTargetYear with the specific semester and year for which you want to find instructors who have taught courses.
+
+ii. Create a view on a single table that retrieves student details:
+
+sql
+Copy code
+CREATE VIEW student_details AS
+SELECT S_ID, name, dept_name AS department_name, tot_cred
+FROM student;
+This query creates a view named student_details that retrieves student details from the student table and renames the dept_name column to department_name.
+
+iii. Rename the column of the table student from dept_name to department_name:
+
+sql
+Copy code
+ALTER TABLE student
+CHANGE COLUMN dept_name department_name VARCHAR(255);
+This command will rename the column from dept_name to department_name.
+
+iv. Delete students whose department is NULL:
+
+sql
+Copy code
+DELETE FROM student
+WHERE department_name IS NULL;
+This command will delete the records of students whose department_name is NULL.
+
+Please be cautious when using DELETE statements, as they can permanently remove data from your database. Make sure to have a backup or use a transaction to avoid accidental data loss.
+[10/24, 9:41 PM] Atharva: Chit 15
+Use MongoDB
+Create Institute Database and Create Student collection
+1. RollNo 2. Student Name 3. Age 4. Branch 5. Address :{ City, State} 6. Hobbies (Array)
+Perform following operations
+1. Create database Institute.
+2. Create collection Students.
+3. Insert 10 documents with above mentioned structure.
+4. Display all students’ information.
+5. Display Student information whose age is greater than 15.
+6. Display Student information sorted on name field
+7. Update student branch Computer of RollNo 3.
+8. Remove document with RollNo 1
+9. Display Student information whose name starts with A
+10. Display the total numbers of documents available in collection.
+11. Display only first 5 documents.
+12. Display all documents instead of first 3.
+13. Display the name of Students who live in Pune City.
+14. Display only Name of all students.
+15. Drop Collection
+
+ChatGPT
+To perform these operations using MongoDB, you'll need to use the MongoDB shell or a MongoDB client in your preferred programming language. Here's how you can execute each of the requested operations:
+
+Create the Institute database:
+mongodb
+Copy code
+use Institute
+Create the Students collection:
+You can create a collection by simply inserting a document into it. Once you insert a document, MongoDB will create the collection automatically.
+
+Insert 10 documents with the specified structure:
+mongodb
+Copy code
+db.Students.insertMany([
+    {
+        "RollNo": 1,
+        "Student Name": "Alice",
+        "Age": 18,
+        "Branch": "Science",
+        "Address": {
+            "City": "New York",
+            "State": "NY"
+        },
+        "Hobbies": ["Reading", "Painting"]
+    },
+    {
+        "RollNo": 2,
+        "Student Name": "Bob",
+        "Age": 20,
+        "Branch": "Math",
+        "Address": {
+            "City": "Los Angeles",
+            "State": "CA"
+        },
+        "Hobbies": ["Hiking", "Cooking"]
+    },
+    {
+        "RollNo": 3,
+        "Student Name": "Charlie",
+        "Age": 16,
+        "Branch": "Engineering",
+        "Address": {
+            "City": "Pune",
+            "State": "MH"
+        },
+        "Hobbies": ["Sports", "Coding"]
+    },
+    // Insert the rest of the documents here
+    // ...
+]);
+Display all students' information:
+mongodb
+Copy code
+db.Students.find()
+Display student information whose age is greater than 15:
+mongodb
+Copy code
+db.Students.find({ "Age": { $gt: 15 } })
+Display student information sorted on the name field:
+mongodb
+Copy code
+db.Students.find().sort({ "Student Name": 1 })
+Update student branch Computer of RollNo 3:
+mongodb
+Copy code
+db.Students.update({ "RollNo": 3 }, { $set: { "Branch": "Computer" } })
+Remove the document with RollNo 1:
+mongodb
+Copy code
+db.Students.deleteOne({ "RollNo": 1 })
+Display student information whose name starts with A:
+mongodb
+Copy code
+db.Students.find({ "Student Name": /^A/ })
+Display the total number of documents available in the collection:
+mongodb
+Copy code
+db.Students.count()
+Display only the first 5 documents:
+mongodb
+Copy code
+db.Students.find().limit(5)
+Display all documents except the first 3:
+mongodb
+Copy code
+db.Students.find().skip(3)
+Display the name of students who live in Pune City:
+mongodb
+Copy code
+db.Students.find({ "Address.City": "Pune" }, { "Student Name": 1 })
+Display only the name of all students:
+mongodb
+Copy code
+db.Students.find({}, { "Student Name": 1, "_id": 0 })
+Drop the Students collection:
+mongodb
+Copy code
+db.Students.drop()
+These operations should help you interact with your MongoDB database as requested. Make sure to adapt the data and document structure to your specific needs.
+[10/24, 9:41 PM] Atharva: Chit 12
+Database Trigger (Row level, After Triggers). Write a database trigger on Library table. The System should keep
+track of the records that are being updated or deleted. The old value of updated or deleted records should be added in
+Library_Audit table.
+
+ChatGPT
+To create a database trigger on the "Library" table to keep track of updated or deleted records and store their old values in a "Library_Audit" table, you can use the following SQL code. This example assumes you're using SQL Server, but the syntax may vary for different database management systems.
+
+sql
+Copy code
+-- Create the Library_Audit table if it doesn't exist
+CREATE TABLE IF NOT EXISTS Library_Audit (
+    AuditID INT IDENTITY(1,1) PRIMARY KEY,
+    LibraryID INT,
+    Action NVARCHAR(10), -- 'UPDATE' or 'DELETE'
+    OldTitle NVARCHAR(255),
+    OldAuthor NVARCHAR(255),
+    OldPublicationYear INT,
+    AuditDate DATETIME
+);
+
+-- Create an AFTER DELETE trigger
+CREATE TRIGGER Library_Audit_Delete
+ON Library
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO Library_Audit (LibraryID, Action, OldTitle, OldAuthor, OldPublicationYear, AuditDate)
+    SELECT
+        deleted.LibraryID,
+        'DELETE',
+        deleted.Title,
+        deleted.Author,
+        deleted.PublicationYear,
+        GETDATE()
+    FROM deleted;
+END;
+
+-- Create an AFTER UPDATE trigger
+CREATE TRIGGER Library_Audit_Update
+ON Library
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO Library_Audit (LibraryID, Action, OldTitle, OldAuthor, OldPublicationYear, AuditDate)
+    SELECT
+        inserted.LibraryID,
+        'UPDATE',
+        deleted.Title, -- old title
+        deleted.Author, -- old author
+        deleted.PublicationYear, -- old publication year
+        GETDATE()
+    FROM deleted
+    JOIN inserted ON deleted.LibraryID = inserted.LibraryID;
+END;
+In this code:
+
+We first create the "Library_Audit" table, which will store information about deleted and updated records in the "Library" table, along with the action, old values, and the audit date.
+
+We create an AFTER DELETE trigger named "Library_Audit_Delete" that activates after a record is deleted from the "Library" table. This trigger captures the old values of the deleted record and inserts them into the "Library_Audit" table.
+
+We create an AFTER UPDATE trigger named "Library_Audit_Update" that activates after a record is updated in the "Library" table. This trigger captures the old values from the "deleted" pseudo-table (old values) and the new values from the "inserted" pseudo-table (new values) and inserts the old values into the "Library_Audit" table along with the action and audit date.
+
+Remember to adjust the column names and data types in the SQL code to match the structure of your "Library" table. Additionally, make sure that your database management system supports triggers and that you have the necessary permissions to create and execute them.
+[10/24, 9:41 PM] Atharva: Chit 18
+Collection “city “ which contains the documents given as below(Perform on Mongo Terminal)
+
+{
+
+city:”pune”,
+type:”urban”,
+state:”MH”,
+population:”5600000”
+}
+-using mapreduce, find statewise population
+-using mapreduce, find citywise population
+-using mapreduce, find typewise population.
+
+ChatGPT
+To perform map-reduce operations on a MongoDB collection to find state-wise, city-wise, and type-wise populations, you can follow the steps below. You can execute these operations in the Mongo shell.
+
+Assuming your collection is named "city," you can use the following map-reduce operations:
+
+State-wise Population:
+javascript
+Copy code
+var mapFunction = function() {
+    emit(this.state, parseInt(this.population));
+};
+
+var reduceFunction = function(key, values) {
+    return Array.sum(values);
+};
+
+var result = db.city.mapReduce(mapFunction, reduceFunction, { out: "state_wise_population" });
+
+// To see the result
+db.state_wise_population.find();
+This code will group the population by state and store the result in a new collection called "state_wise_population."
+
+City-wise Population:
+javascript
+Copy code
+var mapFunction = function() {
+    emit(this.city, parseInt(this.population));
+};
+
+var reduceFunction = function(key, values) {
+    return Array.sum(values);
+};
+
+var result = db.city.mapReduce(mapFunction, reduceFunction, { out: "city_wise_population" });
+
+// To see the result
+db.city_wise_population.find();
+This code will group the population by city and store the result in a new collection called "city_wise_population."
+
+Type-wise Population:
+javascript
+Copy code
+var mapFunction = function() {
+    emit(this.type, parseInt(this.population));
+};
+
+var reduceFunction = function(key, values) {
+    return Array.sum(values);
+};
+
+var result = db.city.mapReduce(mapFunction, reduceFunction, { out: "type_wise_population" });
+
+// To see the result
+db.type_wise_population.find();
+This code will group the population by type and store the result in a new collection called "type_wise_population."
+
+Make sure to replace "city" with the actual name of your collection and modify the field names accordingly if they are different in your documents.
+[10/24, 9:41 PM] Atharva: To create a row-level "before" trigger in a database, you can use SQL, but please note that the specific syntax and capabilities may vary depending on the database management system you're using. Here, I'll provide a generic example of how to create a trigger that keeps track of updated or deleted records in a "Library" table and stores the old values in a "Library_Audit" table. You'll need to adapt this code to the particular database system you're using, as the syntax may differ.
+
+sql
+Copy code
+-- Create a Library_Audit table if it doesn't exist
+CREATE TABLE IF NOT EXISTS Library_Audit (
+    Audit_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Library_ID INT,
+    Title VARCHAR(255),
+    Author VARCHAR(255),
+    Action VARCHAR(10),
+    Action_Date TIMESTAMP
+);
+
+-- Create a BEFORE DELETE and BEFORE UPDATE trigger on the Library table
+DELIMITER $$
+
+CREATE TRIGGER Library_Before_Update_Delete
+    BEFORE DELETE ON Library
+    FOR EACH ROW
+BEGIN
+    -- Insert the old record into Library_Audit for DELETE action
+    INSERT INTO Library_Audit (Library_ID, Title, Author, Action, Action_Date)
+    VALUES (OLD.Library_ID, OLD.Title, OLD.Author, 'DELETE', NOW());
+END $$
+
+DELIMITER $$
+
+CREATE TRIGGER Library_Before_Update_Delete
+    BEFORE UPDATE ON Library
+    FOR EACH ROW
+BEGIN
+    -- Insert the old record into Library_Audit for UPDATE action
+    INSERT INTO Library_Audit (Library_ID, Title, Author, Action, Action_Date)
+    VALUES (OLD.Library_ID, OLD.Title, OLD.Author, 'UPDATE', NOW());
+END $$
+
+DELIMITER ;
+
+Here's a breakdown of the code:
+
+We first create the Library_Audit table to store the old values of records when they are deleted or updated. Adjust the table schema to match your Library table structure.
+
+We use the DELIMITER statement to change the delimiter temporarily to $$. This allows us to define the trigger code in a block.
+
+We create two triggers: one for BEFORE DELETE and another for BEFORE UPDATE. These triggers are set to run for each row that is deleted or updated in the Library table.
+
+Inside each trigger, we use the INSERT statement to add the old record's values to the Library_Audit table, along with the action (either 'DELETE' or 'UPDATE') and a timestamp to indicate when the action occurred.
+
+We use NOW() to capture the current timestamp when the action is performed.
+
+Finally, we set the delimiter back to ; using DELIMITER ;.
+
+Please replace the table and column names, data types, and syntax with the specific ones for your database system, as different database systems have their own variations in SQL syntax.
+[10/24, 9:41 PM] Atharva: Chit 3
+Unnamed PL/SQL code block: Use of Control structure and Exception handling is mandatory. Write a PL/SQL
+block of code for the following requirements:-Consider table Stud(Roll, Att,Status) Write a PL/SQL block for
+following requirement and handle the exceptions. Roll no. of student will be entered by user. Attendance of roll no.
+entered by user will be checked in Stud table. If attendance is less than 75% then display the message “Term not
+granted” and set the status in stud table as “D”. Otherwise display message “Term granted” and set the status in stud
+table as “ND” .
+
+ChatGPT
+You can create a PL/SQL block to fulfill the given requirements by using control structures and exception handling. Here's a sample PL/SQL code block for your scenario:
+
+sql
+Copy code
+DECLARE
+    v_roll_no NUMBER;
+    v_attendance NUMBER;
+    v_status VARCHAR2(2);
+
+BEGIN
+    -- Accept the roll number from the user
+    v_roll_no := &enter_roll_number; -- Use & to prompt the user for input
+
+    -- Retrieve attendance for the entered roll number
+    SELECT Att, Status
+    INTO v_attendance, v_status
+    FROM Stud
+    WHERE Roll = v_roll_no;
+
+    -- Check if attendance is less than 75%
+    IF v_attendance < 75 THEN
+        DBMS_OUTPUT.PUT_LINE('Term not granted');
+        -- Set the status as "D" for insufficient attendance
+        UPDATE Stud
+        SET Status = 'D'
+        WHERE Roll = v_roll_no;
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Term granted');
+        -- Set the status as "ND" for sufficient attendance
+        UPDATE Stud
+        SET Status = 'ND'
+        WHERE Roll = v_roll_no;
+    END IF;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Roll number not found in the Stud table');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END;
+/
+In this code:
+
+We declare variables to store the user's input, attendance, and status.
+We use the &enter_roll_number to accept the user's input for the roll number.
+We then retrieve the attendance and status for the provided roll number using a SELECT statement.
+We check if the attendance is less than 75% and update the status accordingly.
+We handle exceptions such as when the roll number is not found in the table or any other unexpected errors.
+Remember to replace &enter_roll_number with an appropriate input mechanism for your environment, and ensure that you have appropriate permissions to perform SELECT and UPDATE operations on the Stud table.
+[10/24, 9:41 PM] Atharva: Chit 4
+(Perform on MYSQL Terminal)
+student(S_ID,name,dept_name,tot_cred)
+instructor(T_ID,name,dept_name,salary)
+course(course_id,title,dept_name,credits)
+
+i. Find the average salary of instructor in those departments where the average salary is more than Rs. 42000/-.
+ii. Increase the salary of each instructor in the computer department by 10%.
+iii. Find the names of instructors whose names are neither ‘Amol’ nor ‘Amit’.
+iv. Find the names of student which contains ‘am’ as its substring.
+v. Find the name of students from computer department that “DBMS” courses they take.
+
+ChatGPT
+You can perform these tasks in the MySQL terminal with SQL queries. Here's how you can do each of them:
+
+i. Find the average salary of instructors in departments where the average salary is more than Rs. 42000/-:
+
+sql
+Copy code
+SELECT dept_name, AVG(salary) AS avg_salary
+FROM instructor
+GROUP BY dept_name
+HAVING avg_salary > 42000;
+ii. Increase the salary of each instructor in the computer department by 10%:
+
+sql
+Copy code
+UPDATE instructor
+SET salary = salary * 1.10
+WHERE dept_name = 'Computer';
+iii. Find the names of instructors whose names are neither 'Amol' nor 'Amit':
+
+sql
+Copy code
+SELECT name
+FROM instructor
+WHERE name NOT IN ('Amol', 'Amit');
+iv. Find the names of students which contain 'am' as a substring:
+
+sql
+Copy code
+SELECT name
+FROM student
+WHERE name LIKE '%am%';
+v. Find the names of students from the computer department that take "DBMS" courses:
+
+sql
+Copy code
+SELECT s.name
+FROM student s
+JOIN takes t ON s.S_ID = t.S_ID
+JOIN course c ON t.course_id = c.course_id
+WHERE c.title = 'DBMS' AND c.dept_name = 'Computer';
+You can run these SQL queries in your MySQL terminal to achieve the desired results. Make sure to replace the table and column names with the actual names used in your database.
+[10/24, 9:41 PM] Atharva: Chit 9
+Collection “orderinfo“ which contains the documents given as below(Perform on Mongo Terminal)
+{
+cust_id:123
+cust_name:”abc”,
+status:”A”,
+price:250
+}
+i. find the average price for each customers having status 'A'
+ii. Display the status of the customers whose amount/price lie between 100 and 1000
+iii. Display the customers information without “_id” .
+iv. create a simple index on onderinfo collection and fire the queries.
+
+ChatGPT
+To perform these operations on the "orderinfo" collection in MongoDB, you can use the following commands in the MongoDB shell. Ensure that you are connected to the MongoDB server using the mongo command before running these queries.
+
+i. Find the average price for each customer having status 'A':
+
+javascript
+Copy code
+db.orderinfo.aggregate([
+  {
+    $match: { status: "A" }
+  },
+  {
+    $group: {
+      _id: "$cust_id",
+      averagePrice: { $avg: "$price" }
+    }
+  }
+])
+ii. Display the status of customers whose price lies between 100 and 1000:
+
+javascript
+Copy code
+db.orderinfo.find({
+  price: { $gte: 100, $lte: 1000 }
+}, { _id: 0, status: 1 })
+iii. Display customer information without "_id":
+
+javascript
+Copy code
+db.orderinfo.find({}, { _id: 0 })
+iv. Create a simple index on the "orderinfo" collection:
+
+javascript
+Copy code
+db.orderinfo.createIndex({ cust_id: 1 })
+After creating the index, you can fire queries for better performance. For example, to find a document with a specific cust_id, you can do the following:
+
+javascript
+Copy code
+db.orderinfo.find({ cust_id: 123 })
+Make sure to replace the collection name, field names, and values with your actual data if they are different from your example.
+[10/24, 9:41 PM] Atharva: Chit 13
+Collection “movies“ which contains the documents given as below(Perform on Mongo Terminal)
+
+{
+name: “Movie1”,
+type: “action”,
+budget:1000000
+producer:{
+
+name: “producer1”,
+address:”PUNE”
+}
+
+}
+
+i. Find the name of the movie having budget greater than 1,00,000.
+ii. Find the name of producer who lives in Pune
+iii. Update the type of movie “action” to “horror”
+iv. Find all the documents produced by name “producer1” with their address
+
+ChatGPT
+To perform the specified tasks in the MongoDB terminal, you can use the db.collectionName.method() syntax. In this case, your collection is named "movies." Here's how you can accomplish each of the tasks:
+
+i. Find the name of the movie having a budget greater than 1,00,000.
+
+javascript
+Copy code
+db.movies.find({ "budget": { $gt: 100000 } }, { "name": 1, "_id": 0 })
+This query will return the names of movies with a budget greater than 100,000.
+
+ii. Find the name of the producer who lives in Pune.
+
+javascript
+Copy code
+db.movies.find({ "producer.address": "PUNE" }, { "producer.name": 1, "_id": 0 })
+This query will return the name of the producer who lives in Pune.
+
+iii. Update the type of movie "action" to "horror."
+
+javascript
+Copy code
+db.movies.updateMany({ "type": "action" }, { $set: { "type": "horror" } })
+This query will update the type of all movies with "action" to "horror."
+
+iv. Find all the documents produced by name "producer1" with their address.
+
+javascript
+Copy code
+db.movies.find({ "producer.name": "producer1" }, { "_id": 0 })
+This query will return all the documents produced by "producer1" with their address
+[10/24, 9:41 PM] Atharva: Chit 16
+Perform aggregation and Indexing using mongodb on below database
+1. Create a database department
+2. Create a collection as teacher with fields as name , department ,experience and salary
+3. Display the department wise average salary.
+4. Display the no. Of employees working in each department.
+5. Display the department wise minimum salary.
+6. Apply index and drop index
+
+ChatGPT
+To perform aggregation and indexing in MongoDB on the given database and collection, you can follow these steps. I'll provide you with a set of MongoDB commands for each of the tasks you mentioned:
+
+Create a database named "department":
+javascript
+Copy code
+use department
+Create a collection named "teacher" with fields "name," "department," "experience," and "salary":
+javascript
+Copy code
+db.createCollection("teacher")
+Insert some sample data into the "teacher" collection:
+javascript
+Copy code
+db.teacher.insertMany([
+    { "name": "John", "department": "Math", "experience": 5, "salary": 60000 },
+    { "name": "Alice", "department": "Science", "experience": 7, "salary": 70000 },
+    { "name": "Bob", "department": "Math", "experience": 3, "salary": 55000 },
+    { "name": "Eve", "department": "Science", "experience": 2, "salary": 50000 }
+])
+Display the department-wise average salary:
+javascript
+Copy code
+db.teacher.aggregate([
+    {
+        $group: {
+            _id: "$department",
+            avgSalary: { $avg: "$salary" }
+        }
+    }
+])
+Display the number of employees working in each department:
+javascript
+Copy code
+db.teacher.aggregate([
+    {
+        $group: {
+            _id: "$department",
+            count: { $sum: 1 }
+        }
+    }
+])
+Display the department-wise minimum salary:
+javascript
+Copy code
+db.teacher.aggregate([
+    {
+        $group: {
+            _id: "$department",
+            minSalary: { $min: "$salary" }
+        }
+    }
+])
+Apply an index on the "department" field to improve query performance:
+javascript
+Copy code
+db.teacher.createIndex({ department: 1 })
+Drop the index on the "department" field if needed:
+javascript
+Copy code
+db.teacher.dropIndex("department_1")
+Please note that the indexing and dropping of indexes should be done with caution and only as needed for specific performance optimizations. Indexes can consume additional storage, so it's essential to balance query performance with storage considerations.
+[10/24, 9:41 PM] Atharva: Chit 14
+Consider following structure for Mongodb collection and write a query for following requirements in Mongodb
+Teachers (Tname,dno,Experience,Salary,Data_of_Joining)
+Department (Dno,Dname)
+Students(Sname,Roll_No,Class)
+1. Write a query to create above collection insert some sample documents.
+2. Find the information about all teachers of Dno=2 and having salary greater than or equal to 10,000/-
+3. Find the student information having Roll_no=2 or Sname='xyz'
+4. Update student name whose Roll_No=5
+5. Delete all student whose Class is 'FE'
+6. Apply index on Students Collection
+
+ChatGPT
+To achieve the requirements you've listed, you can use the following MongoDB queries:
+
+Create the collections and insert sample documents:
+javascript
+Copy code
+// Create Teachers collection
+db.createCollection("Teachers")
+db.Teachers.insertMany([
+    { Tname: "Teacher1", dno: 1, Experience: 5, Salary: 12000, Date_of_Joining: "2021-01-15" },
+    { Tname: "Teacher2", dno: 2, Experience: 8, Salary: 9500, Date_of_Joining: "2018-05-20" },
+    { Tname: "Teacher3", dno: 2, Experience: 4, Salary: 11000, Date_of_Joining: "2019-09-10" }
+])
+
+// Create Department collection
+db.createCollection("Department")
+db.Department.insertMany([
+    { Dno: 1, Dname: "Math" },
+    { Dno: 2, Dname: "Science" },
+    { Dno: 3, Dname: "History" }
+])
+
+// Create Students collection
+db.createCollection("Students")
+db.Students.insertMany([
+    { Sname: "John", Roll_No: 1, Class: "FE" },
+    { Sname: "Alice", Roll_No: 2, Class: "SE" },
+    { Sname: "Bob", Roll_No: 3, Class: "FE" }
+])
+Find information about all teachers of Dno=2 and having a salary greater than or equal to 10,000:
+javascript
+Copy code
+db.Teachers.find({ dno: 2, Salary: { $gte: 10000 } })
+Find student information having Roll_No=2 or Sname='xyz':
+javascript
+Copy code
+db.Students.find({ $or: [{ Roll_No: 2 }, { Sname: 'xyz' }] })
+Update the student name whose Roll_No=5:
+javascript
+Copy code
+db.Students.updateOne({ Roll_No: 5 }, { $set: { Sname: "UpdatedName" } })
+Delete all students whose Class is 'FE':
+javascript
+Copy code
+db.Students.deleteMany({ Class: 'FE' })
+Apply an index on the Students collection:
+You can create an index on a specific field in the Students collection to improve query performance. For example, if you want to create an index on the "Roll_No" field:
+
+javascript
+Copy code
+db.Students.createIndex({ Roll_No: 1 })
+This will create a single-field ascending index on the "Roll_No" field. You can adjust the index options to fit your specific use case if needed.
+
+Remember to adapt the sample data and queries according to your actual data and requirements.
+[10/24, 9:41 PM] Atharva: Chit 5
+Cursors: (Implicit and Explicit Cursor). Write a PL/SQL block of code using parameterized Cursor, that will merge
+the data available in the newly created table N_RollCall with the data available in the table O_RollCall. If the data
+in the first table already exist in the second table then that data should be skipped.
+
+ChatGPT
+In PL/SQL, you can use explicit cursors to fetch data from tables and perform operations on them. To achieve the task you've described, you can create a parameterized cursor to fetch data from the N_RollCall table, and then use an INSERT INTO statement with a WHERE NOT EXISTS subquery to avoid inserting duplicates into the O_RollCall table.
+
+Here's a PL/SQL block of code to merge the data from N_RollCall into O_RollCall without duplicating records:
+
+sql
+Copy code
+DECLARE
+  -- Declare a parameterized cursor for N_RollCall.
+  CURSOR n_cursor IS
+    SELECT *
+    FROM N_RollCall;
+
+  -- Declare variables to store data fetched from the cursor.
+  n_id N_RollCall.id%TYPE;
+  n_name N_RollCall.name%TYPE;
+
+BEGIN
+  -- Open the cursor.
+  OPEN n_cursor;
+
+  -- Loop through the cursor records.
+  LOOP
+    FETCH n_cursor INTO n_id, n_name;
+
+    -- Exit the loop when no more records are found.
+    EXIT WHEN n_cursor%NOTFOUND;
+
+    -- Check if the data doesn't exist in O_RollCall.
+    INSERT INTO O_RollCall (id, name)
+    SELECT n_id, n_name
+    FROM dual
+    WHERE NOT EXISTS (
+      SELECT 1
+      FROM O_RollCall
+      WHERE id = n_id
+      AND name = n_name
+    );
+
+  END LOOP;
+
+  -- Close the cursor.
+  CLOSE n_cursor;
+
+  -- Commit the transaction to save the changes.
+  COMMIT;
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Handle exceptions, e.g., log the error.
+    DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+    ROLLBACK;
+END;
+/
+This code defines an explicit cursor (n_cursor) to fetch data from the N_RollCall table and then loops through the records. For each record fetched, it checks if the data with the same ID and name doesn't exist in the O_RollCall table using a WHERE NOT EXISTS subquery. If it doesn't exist, it inserts the data into the O_RollCall table.
+
+Please note that this code assumes that the N_RollCall and O_RollCall tables have id and name columns. You should adapt the column names and data types as needed for your specific tables.
+[10/24, 9:41 PM] Atharva: Chit 2
+Unnamed PL/SQL code block: Use of Control structure and Exception handling is mandatory.
+Write a PL/SQL block of code for the following requirements:-
+Schema:
+1. Borrower(Rollin, Name, DateofIssue, NameofBook, Status)
+2. Fine(Roll_no,Date,Amt)
+Accept roll_no & name of book from user.
+Check the number of days (from date of issue), if days are between 15 to 30 then fine
+amount will be Rs 5per day.
+If no. of days>30, per day fine will be Rs 50 per day & for days less than 30, Rs. 5 per
+day.
+After submitting the book, status will change from I to R.
+If condition of fine is true, then details will be stored into fine table.
+
+ChatGPT
+Here is a PL/SQL block of code that meets the specified requirements for the Borrower and Fine schemas. It uses control structures and exception handling as mandated:
+
+sql
+Copy code
+DECLARE
+    v_roll_no     NUMBER;
+    v_name_of_book VARCHAR2(50);
+    v_issue_date  DATE;
+    v_status      CHAR(1);
+    v_fine_amt    NUMBER;
+    v_fine_days   NUMBER;
+
+    v_current_date DATE := SYSDATE;
+BEGIN
+    -- Accepting input from the user
+    v_roll_no := &roll_no; -- Use substitution variable for roll_no
+    v_name_of_book := '&name_of_book'; -- Use substitution variable for name_of_book
+
+    -- Retrieve borrower information
+    SELECT DateofIssue, Status
+    INTO v_issue_date, v_status
+    FROM Borrower
+    WHERE Rollin = v_roll_no AND NameofBook = v_name_of_book;
+
+    -- Calculate the number of days overdue
+    v_fine_days := v_current_date - v_issue_date;
+
+    -- Check if the book is overdue
+    IF v_fine_days > 0 THEN
+        IF v_fine_days <= 15 THEN
+            v_fine_amt := v_fine_days * 5; -- Rs. 5 per day for up to 15 days
+        ELSIF v_fine_days <= 30 THEN
+            v_fine_amt := v_fine_days * 10; -- Rs. 5 per day for 1-15 days, Rs. 10 per day for 16-30 days
+        ELSE
+            v_fine_amt := v_fine_days * 50; -- Rs. 50 per day for more than 30 days
+        END IF;
+
+        -- Insert fine details into the Fine table
+        INSERT INTO Fine (Roll_no, Date, Amt)
+        VALUES (v_roll_no, SYSDATE, v_fine_amt);
+
+        -- Update the status to 'R' (Returned)
+        UPDATE Borrower
+        SET Status = 'R'
+        WHERE Rollin = v_roll_no AND NameofBook = v_name_of_book;
+
+        DBMS_OUTPUT.PUT_LINE('Fine of Rs. ' || v_fine_amt || ' has been imposed.');
+        DBMS_OUTPUT.PUT_LINE('Book status updated to "R" (Returned).');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('The book is not overdue. No fine will be imposed.');
+    END IF;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Borrower or book not found.');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END;
+/
+In this PL/SQL block, the code accepts the roll_no and name_of_book as input from the user and calculates the fine based on the number of days overdue. It then inserts the fine details into the Fine table and updates the status of the book in the Borrower table. It also includes exception handling to deal with cases where the borrower or book is not found, as well as other potential errors.
+[10/24, 9:41 PM] Atharva: Chit 17
+Use MySQL Create Employee table, Project table and add rows shown below
+
+1. Find different locations from where employees belong to?
+2. What is maximum and minimum salary?
+3. Display the content of employee table according to the ascending order of salary amount.
+4. Find the name of employee who lived in Nasik or Pune city.
+5. Find the name of employees who does not get commission.
+6. Change the city of Amit to Nashik.
+7. Find the information of employees whose name starts with ‘A’.
+8. Find the count of staff from Mumbai.
+9. Find the count of staff from each city
+10. Find the address from where employees are belonging as well as where projects are
+going on.
+11. Find city wise minimum salary.
+12. Find city wise maximum salary having maximum salary greater than 26000
+13. Delete the employee who is having salary greater than 30,000.
+
+ChatGPT
+To perform the tasks listed, you'll need to create and populate the Employee and Project tables in MySQL first. Here's a step-by-step guide on how to do this and then execute the queries for each of the tasks:
+
+Create Employee and Project tables:
+sql
+Copy code
+CREATE TABLE Employee (
+    EmployeeID INT PRIMARY KEY,
+    EmployeeName VARCHAR(255),
+    City VARCHAR(255),
+    Salary DECIMAL(10, 2),
+    Commission DECIMAL(10, 2)
+);
+
+CREATE TABLE Project (
+    ProjectID INT PRIMARY KEY,
+    ProjectName VARCHAR(255),
+    ProjectLocation VARCHAR(255)
+);
+Add rows to the Employee and Project tables:
+sql
+Copy code
+-- Add rows to Employee table
+INSERT INTO Employee (EmployeeID, EmployeeName, City, Salary, Commission)
+VALUES
+    (1, 'John', 'New York', 40000, 5000),
+    (2, 'Alice', 'Los Angeles', 45000, 2000),
+    (3, 'Bob', 'Chicago', 35000, NULL),
+    (4, 'Amit', 'Mumbai', 30000, NULL),
+    (5, 'Catherine', 'New York', 38000, 3000),
+    (6, 'David', 'Nashik', 32000, 1000),
+    (7, 'Eve', 'Pune', 28000, NULL);
+
+-- Add rows to Project table
+INSERT INTO Project (ProjectID, ProjectName, ProjectLocation)
+VALUES
+    (101, 'Project A', 'New York'),
+    (102, 'Project B', 'Los Angeles'),
+    (103, 'Project C', 'Chicago'),
+    (104, 'Project D', 'Nashik');
+Now, you can execute the queries for the tasks:
+
+Find different locations from where employees belong to:
+sql
+Copy code
+SELECT DISTINCT City FROM Employee;
+What is the maximum and minimum salary?
+sql
+Copy code
+SELECT MAX(Salary) AS MaximumSalary, MIN(Salary) AS MinimumSalary FROM Employee;
+Display the content of the employee table according to the ascending order of the salary amount:
+sql
+Copy code
+SELECT * FROM Employee ORDER BY Salary ASC;
+Find the name of employees who lived in Nasik or Pune city:
+sql
+Copy code
+SELECT EmployeeName FROM Employee WHERE City IN ('Nashik', 'Pune');
+Find the name of employees who do not get a commission:
+sql
+Copy code
+SELECT EmployeeName FROM Employee WHERE Commission IS NULL;
+Change the city of Amit to Nashik:
+sql
+Copy code
+UPDATE Employee SET City = 'Nashik' WHERE EmployeeName = 'Amit';
+Find the information of employees whose name starts with 'A':
+sql
+Copy code
+SELECT * FROM Employee WHERE EmployeeName LIKE 'A%';
+Find the count of staff from Mumbai:
+sql
+Copy code
+SELECT COUNT(*) AS MumbaiStaffCount FROM Employee WHERE City = 'Mumbai';
+Find the count of staff from each city:
+sql
+Copy code
+SELECT City, COUNT(*) AS StaffCount FROM Employee GROUP BY City;
+Find the address from where employees are belonging as well as where projects are going on:
+sql
+Copy code
+SELECT City AS Address FROM Employee
+UNION
+SELECT ProjectLocation AS Address FROM Project;
+Find city-wise minimum salary:
+sql
+Copy code
+SELECT City, MIN(Salary) AS MinSalary FROM Employee GROUP BY City;
+Find city-wise maximum salary having a maximum salary greater than 26000:
+sql
+Copy code
+SELECT City, MAX(Salary) AS MaxSalary
+FROM Employee
+GROUP BY City
+HAVING MaxSalary > 26000;
+Delete the employee who is having a salary greater than 30,000:
+sql
+Copy code
+DELETE FROM Employee WHERE Salary > 30000;
+Please be careful when executing delete statements, as they permanently remove data from the table. Make sure you have a backup or are working in a test environment.
+[10/25, 11:34 AM] Atharva: Chit 19
+Use MySQL
+Create a table emp with following fields and constraints
+Eno –(Constraint:- primary key and apply sequence starts with 101) ,Ename –(Constraint :- not null)
+Address ––(Constraint :-default ‘Nashik’) ,Joindate,
+After table creation add field - Post in the emp table.
+Insert some data in emp table.Create Index on Ename field of employee table.
+Create View on employee table to show only Ename and Salary.
+
+ChatGPT
+To create the "emp" table with the specified fields and constraints, add a new field "Post," insert some data, create an index on the "Ename" field, and create a view to show only "Ename" and "Salary," you can use the following SQL commands in MySQL:
+
+sql
+Copy code
+-- Step 1: Create the "emp" table with fields and constraints
+CREATE TABLE emp (
+    Eno INT PRIMARY KEY AUTO_INCREMENT,
+    Ename VARCHAR(255) NOT NULL,
+    Address VARCHAR(255) DEFAULT 'Nashik',
+    Joindate DATE
+);
+
+-- Step 2: Add the "Post" field to the "emp" table
+ALTER TABLE emp
+ADD COLUMN Post VARCHAR(255);
+
+-- Step 3: Insert some data into the "emp" table
+INSERT INTO emp (Ename, Joindate, Post) VALUES
+    ('John Doe', '2023-10-25', 'Manager'),
+    ('Jane Smith', '2023-10-26', 'Developer'),
+    ('Bob Johnson', '2023-10-27', 'Designer');
+
+-- Step 4: Create an index on the "Ename" field
+CREATE INDEX idx_ename ON emp (Ename);
+
+-- Step 5: Create a view to show only "Ename" and "Salary"
+-- (You mentioned showing "Salary" even though it's not present in the table; you may need to add this field to the table)
+CREATE VIEW emp_view AS
+SELECT Ename, Salary FROM emp;
+In the code above, we first create the "emp" table with the specified fields and constraints. Then, we add the "Post" field using the ALTER TABLE statement. Next, we insert some sample data into the table.
+
+We create an index on the "Ename" field to optimize query performance. Please note that you mentioned showing "Salary" in the view, but there is no "Salary" field in the original table. You would need to add this field to the table and populate it with relevant salary information if it's a necessary part of your data.
+[10/25, 11:34 AM] Atharva: Chit 20
+Use MongoDB
+Indexing
+1. Create Collection
+2. Insert some Documents
+3. Create Single Index,
+4. Create Compound Index,
+5. Create Unique on Collection
+6. Show Index Information
+7. Remove Index
+Aggregation
+Collection creation Student and insert following data in that:
+Rollno:1,name:'Navin',subject:'DMSA',marks:78
+Rollno:2,name:'anusha',subject:'OSD',marks:75
+Rollno:3,name:'ravi',subject:'TOC',marks:69
+Rollno:4,name:'veena',subject:'TOC',marks:70
+Rollno:5,name:‘Pravini',subject:‘OSD',marks:80
+Rollno:6,name: ‘Reena',subject: ‘DMSA',marks:50
+Rollno:7,name:‘Geeta',subject:‘CN',marks:90
+Rollno:8,name:‘Akash',subject:‘CN',marks:85
+1. Write aggregate function to find Max marks of Each Subject.
+2. Write aggregate function to find Min marks of Each Subject.
+3. Write aggregate function to find Sum of marks of Each Subject.
+4. Write aggregate function to find Avg marks of Each Subject.
+5. Write aggregate function to find first record Each Subject.
+6. Write aggregate function to find Last record of Each Subject.
+7. Write aggregate function to find count number of records of each subject
+8. Write aggregate function to find count number of records of each subject
+
+ChatGPT
+To perform the tasks in MongoDB as you described, follow these steps:
+
+Indexing:
+
+Create a Collection:
+javascript
+Copy code
+db.createCollection("Student")
+Insert Documents:
+Insert the provided documents into the "Student" collection.
+
+Create a Single Index:
+Create a single index on the "subject" field:
+
+javascript
+Copy code
+db.Student.createIndex({ subject: 1 })
+Create a Compound Index:
+Create a compound index on the "subject" and "marks" fields:
+
+javascript
+Copy code
+db.Student.createIndex({ subject: 1, marks: 1 })
+Create a Unique Index:
+Create a unique index on the "Rollno" field to ensure each student has a unique roll number:
+
+javascript
+Copy code
+db.Student.createIndex({ Rollno: 1 }, { unique: true })
+Show Index Information:
+To display the information about the indexes in the "Student" collection:
+
+javascript
+Copy code
+db.Student.getIndexes()
+Remove an Index:
+To remove an index, use the dropIndex method. For example, to remove the index on "subject":
+
+javascript
+Copy code
+db.Student.dropIndex({ subject: 1 })
+Aggregation:
+
+Find Max Marks of Each Subject:
+javascript
+Copy code
+db.Student.aggregate([
+    {
+        $group: {
+            _id: "$subject",
+            maxMarks: { $max: "$marks" }
+        }
+    }
+])
+Find Min Marks of Each Subject:
+javascript
+Copy code
+db.Student.aggregate([
+    {
+        $group: {
+            _id: "$subject",
+            minMarks: { $min: "$marks" }
+        }
+    }
+])
+Find Sum of Marks of Each Subject:
+javascript
+Copy code
+db.Student.aggregate([
+    {
+        $group: {
+            _id: "$subject",
+            totalMarks: { $sum: "$marks" }
+        }
+    }
+])
+Find Avg Marks of Each Subject:
+javascript
+Copy code
+db.Student.aggregate([
+    {
+        $group: {
+            _id: "$subject",
+            avgMarks: { $avg: "$marks" }
+        }
+    }
+])
+Find First Record of Each Subject:
+javascript
+Copy code
+db.Student.aggregate([
+    {
+        $group: {
+            _id: "$subject",
+            firstRecord: { $first: "$$ROOT" }
+        }
+    }
+])
+Find Last Record of Each Subject:
+javascript
+Copy code
+db.Student.aggregate([
+    {
+        $group: {
+            _id: "$subject",
+            lastRecord: { $last: "$$ROOT" }
+        }
+    }
+])
+Count Number of Records for Each Subject:
+javascript
+Copy code
+db.Student.aggregate([
+    {
+        $group: {
+            _id: "$subject",
+            count: { $sum: 1 }
+        }
+    }
+])
+Count Number of Records for Each Subject (Alternate Method):
+javascript
+Copy code
+db.Student.aggregate([
+    {
+        $group: {
+            _id: "$subject",
+            count: { $sum: 1 }
+        }
+    }
+])
+These aggregation queries will provide the requested information based on the "Student" collection data.
+[10/25, 11:34 AM] Atharva: Chit 21
+Collection “orderinfo“ which contains the documents given as below(Perform on Mongo Terminal)
+{
+cust_id:123
+cust_name:”abc”,
+status:”A”,
+price:250
+}
+
+i. Add “Age” field to the orderinfo collection
+ii. Create the complex index on orderinfo collection and fire the queries and drop the duplicates.
+iii. Display the average price for each customer group by status
+iv. Change the customer’s name whose status is “B”
+
+ChatGPT
+To perform these tasks on the "orderinfo" collection in MongoDB, you can use the following commands in the MongoDB shell:
+
+i. Add "Age" field to the orderinfo collection:
+
+Assuming you want to add an "Age" field with a value to all documents in the "orderinfo" collection, you can use the following command:
+
+javascript
+Copy code
+db.orderinfo.updateMany({}, { $set: { Age: 30 } })
+This command will add an "Age" field with a value of 30 to all documents in the collection. You can change the value to the desired age.
+
+ii. Create a complex index on the orderinfo collection:
+
+Creating an index depends on the fields you want to index. To create an index on specific fields, you can use the createIndex method. For example, if you want to create an index on the "cust_id" and "status" fields, you can use the following command:
+
+javascript
+Copy code
+db.orderinfo.createIndex({ cust_id: 1, status: 1 })
+To fire queries with this index, you can simply run your queries as usual, and MongoDB will use the index for optimization.
+
+To drop duplicates, you can use the dropDuplicates option when creating the index. However, be careful when using this option, as it may remove documents with duplicate values in the indexed fields.
+
+iii. Display the average price for each customer group by status:
+
+To display the average price for each customer group by status, you can use the aggregate framework. Here's an example query:
+
+javascript
+Copy code
+db.orderinfo.aggregate([
+    {
+        $group: {
+            _id: "$status",
+            avgPrice: { $avg: "$price" }
+        }
+    }
+])
+This query will group the documents by the "status" field and calculate the average price for each group.
+
+iv. Change the customer's name whose status is "B":
+
+Assuming you want to change the customer's name where the "status" is "B," you can use the updateOne or updateMany method. Here's an example using updateOne:
+
+javascript
+Copy code
+db.orderinfo.updateOne(
+    { status: "B" },
+    { $set: { cust_name: "New Name" } }
+)
+This command will update the "cust_name" to "New Name" for the first document that has a "status" of "B." If you want to update all documents with "status" "B," you can use updateMany instead of updateOne.
+[10/25, 11:34 AM] Atharva: Chit 22:
+
+Collection “orderinfo“ which contains the documents given as below(Perform on Mongo Terminal)
+{
+cust_id:123
+cust_name:”abc”,
+status:”A”,
+price:250
+}
+i. Display the name of the customer having the price between 250 and 450
+ii. Increment the price by 10 for cust_id: 123 and decrement the price by 5 for cust_id: 124
+iii. Remove any one of the field from the orderinfo collection.
+iv. Find the name of the customer whose status is either A or price is 250 or both.
+
+ChatGPT
+You can perform the requested operations on the "orderinfo" collection in MongoDB using the Mongo Shell. Here are the commands to accomplish each task:
+
+i. Display the name of the customer having the price between 250 and 450:
+
+javascript
+Copy code
+db.orderinfo.find({ price: { $gte: 250, $lte: 450 } }, { cust_name: 1, _id: 0 })
+ii. Increment the price by 10 for cust_id: 123 and decrement the price by 5 for cust_id: 124:
+
+javascript
+Copy code
+db.orderinfo.update({ cust_id: 123 }, { $inc: { price: 10 } })
+db.orderinfo.update({ cust_id: 124 }, { $inc: { price: -5 } })
+iii. Remove any one of the field from the orderinfo collection:
+You can remove a field from a document in the collection using $unset. For example, if you want to remove the "status" field from all documents:
+
+javascript
+Copy code
+db.orderinfo.update({}, { $unset: { status: 1 } }, { multi: true })
+iv. Find the name of the customer whose status is either A or price is 250 or both:
+
+javascript
+Copy code
+db.orderinfo.find({
+  $or: [
+    { status: "A" },
+    { price: 250 }
+  ]
+}, { cust_name: 1, _id: 0 })
+Please note that you should replace "db.orderinfo" with the actual name of your collection if it's different. Also, ensure that you have a MongoDB instance running and the database is selected in the Mongo Shell where your "orderinfo" collection is located.
+[10/25, 11:34 AM] Atharva: Chit 23:
+Using MySQL and JAVA conncetivity (Two Tier) perform the following queries
+i. Create a table of employee details , Employee(SSN, Ename,state, salary)
+ii. Insert Records into Employee table
+iii. Retrieve the details based on Social Security Number(SSN).
+iv. Update the employee state from 'MH' to 'TN'
+v. Delete all the employees from ‘Gujrat’
+
+ChatGPT
+To perform these queries using MySQL and Java connectivity in a two-tier application, you'll need to follow these steps:
+
+Set up your MySQL database.
+Create a Java program to connect to the database and execute the queries.
+Here's a step-by-step guide:
+
+1. Set up your MySQL database:
+
+You should have MySQL installed, and you'll need a database and a user with appropriate permissions. Create a database and a table as specified:
+
+sql
+Copy code
+CREATE DATABASE EmployeeDB;
+USE EmployeeDB;
+
+CREATE TABLE Employee (
+    SSN INT PRIMARY KEY,
+    Ename VARCHAR(255),
+    state VARCHAR(2),
+    salary DECIMAL(10, 2)
+);
+2. Create a Java program to connect to the database and execute the queries:
+
+You'll need to use the MySQL JDBC driver to connect to the database. Make sure to download and include the MySQL JDBC driver in your project.
+
+Here's a Java program to perform the queries:
+
+java
+Copy code
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class EmployeeDatabase {
+    private static final String DB_URL = "jdbc:mysql://localhost/EmployeeDB";
+    private static final String DB_USER = "your_username";
+    private static final String DB_PASS = "your_password";
+
+    public static void main(String[] args) {
+        try {
+            // Step 1: Establish a connection to the database
+            Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+
+            // Step 2: Create a table of employee details
+            // (This is done during database setup)
+
+            // Step 3: Insert records into the Employee table
+            insertEmployee(connection, 12345, "John Doe", "MH", 50000.00);
+
+            // Step 4: Retrieve details based on SSN
+            retrieveEmployeeBySSN(connection, 12345);
+
+            // Step 5: Update employee state from 'MH' to 'TN'
+            updateEmployeeState(connection, 12345, "TN");
+
+            // Step 6: Delete all employees from 'Gujrat'
+            deleteEmployeesByState(connection, "Gujrat");
+
+            // Close the connection
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void insertEmployee(Connection connection, int ssn, String ename, String state, double salary) throws SQLException {
+        String insertQuery = "INSERT INTO Employee (SSN, Ename, state, salary) VALUES (?, ?, ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
+        preparedStatement.setInt(1, ssn);
+        preparedStatement.setString(2, ename);
+        preparedStatement.setString(3, state);
+        preparedStatement.setDouble(4, salary);
+        preparedStatement.executeUpdate();
+        System.out.println("Employee inserted successfully.");
+    }
+
+    private static void retrieveEmployeeBySSN(Connection connection, int ssn) throws SQLException {
+        String retrieveQuery = "SELECT * FROM Employee WHERE SSN = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(retrieveQuery);
+        preparedStatement.setInt(1, ssn);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            System.out.println("SSN: " + resultSet.getInt("SSN"));
+            System.out.println("Name: " + resultSet.getString("Ename"));
+            System.out.println("State: " + resultSet.getString("state"));
+            System.out.println("Salary: " + resultSet.getDouble("salary"));
+        }
+    }
+
+    private static void updateEmployeeState(Connection connection, int ssn, String newState) throws SQLException {
+        String updateQuery = "UPDATE Employee SET state = ? WHERE SSN = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
+        preparedStatement.setString(1, newState);
+        preparedStatement.setInt(2, ssn);
+        int updatedRows = preparedStatement.executeUpdate();
+        System.out.println(updatedRows + " employee(s) updated.");
+    }
+
+    private static void deleteEmployeesByState(Connection connection, String state) throws SQLException {
+        String deleteQuery = "DELETE FROM Employee WHERE state = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery);
+        preparedStatement.setString(1, state);
+        int deletedRows = preparedStatement.executeUpdate();
+        System.out.println(deletedRows + " employee(s) deleted.");
+    }
+}
+Remember to replace your_username and your_password with your MySQL credentials. This code will perform the operations you specified in your question.
+[10/25, 11:34 AM] Atharva: Chit 24:
+(Perform on MYSQL Terminal)
+Emp(emp_id,ename, street, city)
+works(emp_id,c_id,ename, cname, sal)
+Company(c_id,cname, city)
+Manager(mgr_id, mgrname)
+i. Modify the database so that a particular company (eg. ABC) now in Pune
+ii. Give all managers of Mbank a 10% raise. If salary is >20,000, give only 3% raise.
+iii. Find out the names of all the employees who works in ‘Bosch’ company in city Pune
+iv. Delete all records in the works table for employees of a particular company (Eg, SBC Company)
+whose salary>50,000.
+
+ChatGPT
+To perform these tasks on a MySQL database using the MySQL terminal, you can use SQL queries. Here are the queries for each of the tasks:
+
+i. Modify the database so that a particular company (e.g., ABC) is now in Pune:
+
+sql
+Copy code
+UPDATE Company
+SET city = 'Pune'
+WHERE cname = 'ABC';
+This query updates the 'Company' table to set the city to 'Pune' where the company name is 'ABC'.
+
+ii. Give all managers of Mbank a 10% raise. If the salary is >20,000, give only a 3% raise:
+
+sql
+Copy code
+UPDATE Manager
+SET mgrname = CASE
+    WHEN mgrname = 'Mbank' THEN mgrname
+    ELSE mgrname
+  END,
+  sal = CASE
+    WHEN mgrname = 'Mbank' THEN sal * 1.10
+    WHEN mgrname <> 'Mbank' AND sal > 20000 THEN sal * 1.03
+    ELSE sal
+  END;
+This query updates the 'Manager' table, giving a 10% raise to managers of 'Mbank' and a 3% raise to managers with a salary greater than 20,000.
+
+iii. Find out the names of all the employees who work at the 'Bosch' company in the city of Pune:
+
+sql
+Copy code
+SELECT E.ename
+FROM Emp E
+JOIN works W ON E.emp_id = W.emp_id
+JOIN Company C ON W.c_id = C.c_id
+WHERE C.cname = 'Bosch' AND C.city = 'Pune';
+This query joins the 'Emp', 'works', and 'Company' tables to find the names of employees working at 'Bosch' in Pune.
+
+iv. Delete all records in the 'works' table for employees of a particular company (e.g., SBC Company) whose salary is greater than 50,000:
+
+sql
+Copy code
+DELETE FROM works
+WHERE c_id = (SELECT c_id FROM Company WHERE cname = 'SBC Company') AND sal > 50000;
+This query deletes all records from the 'works' table for employees of 'SBC Company' with a salary greater than 50,000.
+
+Please be cautious when running these queries, and make sure to have a backup of your database or run them in a safe environment to avoid data loss.
+[10/25, 11:34 AM] Atharva: Chit 25:
+
+(Perform on MYSQL Terminal)
+Empl(e_no, e_name, post, pay_rate)
+Position(pos_no, post)
+Duty-alloc (pos_no, e_no, month,year, shift)
+Implement the following SQL queries
+i. Get duty allocation details for e_no 123 for the first shift in the month of April 2003
+ii. Get the employees whose rate of pay is > or equal rate of pay of employees 'Sachin'.
+iii. Create a view for displaying minimum, maximum and average salary for all the posts.
+iv. Get count of different employees on each shift having post ‘manager’.
+
+ChatGPT
+You can use SQL queries to interact with your MySQL database to perform the requested tasks. Here are the SQL queries for each of your requirements:
+
+i. Get duty allocation details for e_no 123 for the first shift in the month of April 2003:
+
+sql
+Copy code
+SELECT * FROM Duty-alloc
+WHERE e_no = 123
+  AND month = 'April'
+  AND year = 2003
+  AND shift = 1;
+ii. Get the employees whose rate of pay is > or equal to the rate of pay of employees 'Sachin':
+
+sql
+Copy code
+SELECT * FROM Empl
+WHERE pay_rate >= (SELECT pay_rate FROM Empl WHERE e_name = 'Sachin');
+iii. Create a view for displaying the minimum, maximum, and average salary for all the posts:
+
+sql
+Copy code
+CREATE VIEW SalarySummary AS
+SELECT post,
+       MIN(pay_rate) AS min_salary,
+       MAX(pay_rate) AS max_salary,
+       AVG(pay_rate) AS avg_salary
+FROM Empl
+GROUP BY post;
+Now you can query the view SalarySummary to get the desired information:
+
+sql
+Copy code
+SELECT * FROM SalarySummary;
+iv. Get the count of different employees on each shift having the post 'manager':
+
+sql
+Copy code
+SELECT shift, COUNT(e_no) as employee_count
+FROM Duty-alloc
+WHERE pos_no = (SELECT pos_no FROM Position WHERE post = 'manager')
+GROUP BY shift;
+These SQL queries should help you achieve the tasks you described in your scenario. Make sure to adjust the table and column names if they don't exactly match your database schema.
